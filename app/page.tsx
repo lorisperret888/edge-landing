@@ -1,6 +1,22 @@
 'use client'
 
+import { useState } from 'react'
+import { supabase } from '../lib/supabase'
+
 export default function Home() {
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
+
+  async function handleSubmit() {
+    if(!email) return
+    setLoading(true)
+    await supabase.from('leads').insert({ email, phone })
+    setSubmitted(true)
+    setLoading(false)
+  }
+
   return (
     <>
       <style>{`
@@ -33,7 +49,6 @@ export default function Home() {
         .ticker-track{display:flex;animation:ticker 30s linear infinite;white-space:nowrap}
         .tick{display:inline-flex;align-items:center;gap:10px;padding:14px 32px;border-right:1px solid rgba(255,255,255,0.06);flex-shrink:0}
         .tick-name{font-family:'Syne',sans-serif;font-weight:700;font-size:10px;color:#fff;letter-spacing:3px}
-        .tick-sub{font-size:8px;color:#6b6880;letter-spacing:1px}
         .tick-dot{width:3px;height:3px;background:#a259f7;border-radius:50%}
         @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
         .section{padding:100px 0;border-bottom:1px solid rgba(255,255,255,0.06)}
@@ -87,7 +102,7 @@ export default function Home() {
         .faq-wrap{border:1px solid rgba(255,255,255,0.06);margin-top:48px}
         .faq-item{border-bottom:1px solid rgba(255,255,255,0.06)}
         .faq-item:last-child{border-bottom:none}
-        .faq-q{padding:22px 32px;font-size:11px;color:#fff;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:20px;font-weight:700;letter-spacing:.5px;list-style:none}
+        .faq-q{padding:22px 32px;font-size:11px;color:#fff;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:20px;font-weight:700;letter-spacing:.5px}
         .faq-q:hover{background:#0d0c18}
         .faq-icon{font-size:18px;color:#6b6880;flex-shrink:0}
         .faq-a{padding:0 32px 22px;font-size:11px;color:#6b6880;line-height:2.1;display:none}
@@ -97,6 +112,17 @@ export default function Home() {
         .cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(100,40,180,0.1) 0%,transparent 65%);pointer-events:none}
         .cta-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(48px,9vw,110px);color:#fff;letter-spacing:clamp(6px,1.5vw,20px);line-height:.95;margin-bottom:12px;position:relative}
         .cta-sub{font-size:11px;color:#6b6880;letter-spacing:5px;margin-bottom:48px;position:relative}
+        .capture-section{background:#0d0c18;border-top:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);padding:100px 0}
+        .capture-card{max-width:560px;margin:0 auto;text-align:center}
+        .capture-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(28px,4vw,44px);color:#fff;margin-bottom:12px;letter-spacing:1px}
+        .capture-sub{font-size:12px;color:#6b6880;line-height:2;margin-bottom:40px}
+        .capture-form{display:flex;flex-direction:column;gap:12px}
+        .capture-input{background:#080810;border:1px solid rgba(255,255,255,0.08);color:#fff;font-family:inherit;font-size:12px;padding:14px 18px;outline:none;transition:border-color .2s;width:100%}
+        .capture-input:focus{border-color:rgba(162,89,247,0.4)}
+        .capture-input::placeholder{color:#6b6880}
+        .capture-btn{background:#fff;color:#080810;border:none;padding:14px;font-size:10px;font-family:inherit;cursor:pointer;letter-spacing:4px;font-weight:700;transition:all .3s}
+        .capture-btn:hover{background:#a259f7;color:#fff}
+        .capture-success{font-size:13px;color:#a259f7;letter-spacing:3px;padding:20px}
         footer{border-top:1px solid rgba(255,255,255,0.06);padding:32px 48px;display:flex;align-items:center;justify-content:space-between;background:#0d0c18}
         .footer-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:#fff;letter-spacing:7px}
         .footer-links{display:flex;gap:24px}
@@ -114,7 +140,7 @@ export default function Home() {
           <a href="#vision">Vision</a>
           <a href="#faq">FAQ</a>
         </div>
-        <button className="nav-btn" onClick={() => document.getElementById('bundle')?.scrollIntoView({behavior:'smooth'})}>COMMENCER →</button>
+        <button className="nav-btn" onClick={() => document.getElementById('bundle')?.scrollIntoView({behavior:'smooth'})}>COMMENCER</button>
       </nav>
 
       <section id="hero">
@@ -149,12 +175,12 @@ export default function Home() {
           <h2 className="h2">Six outils.<br/>Un système.</h2>
           <div className="tools-list">
             {[
-              {num:'01',name:'EDGE PREP',tag:'BRIEFING PRÉ-SESSION',desc:'Es-tu en état de trader aujourd\'hui ? EDGE Prep analyse ton état mental et te donne un verdict avant d\'ouvrir ton premier chart.',price:'7.99€',once:'70€'},
-              {num:'02',name:'EDGE VALIDATOR',tag:'IA — VALIDATION DE TRADES',desc:'Ton trade respecte-t-il vraiment ton plan ? EDGE Validator analyse chaque condition et rend son verdict — sans émotion.',price:'19.99€',once:'197€'},
-              {num:'03',name:'EDGE RISK',tag:'GESTION DU RISQUE',desc:'Combien risquer sur ce trade ? EDGE Risk calcule ta position en temps réel et s\'adapte à ta série en cours.',price:'7.99€',once:'70€'},
-              {num:'04',name:'EDGE INDICATOR',tag:'PINE SCRIPT V6 — TRADINGVIEW',desc:'L\'indicateur qui lit le marché à ta place. VWAPs, sessions, FVG, signaux filtrés — tout sur un seul chart.',price:'4.99€',once:'47€'},
-              {num:'05',name:'EDGE JOURNAL',tag:'JOURNAL + TRACK RECORD',desc:'Note chaque trade en quelques secondes. Identifie tes erreurs. Mesure ta vraie progression.',price:'14.99€',once:'147€'},
-              {num:'06',name:'EDGE STATS',tag:'ANALYSE DE PERFORMANCE',desc:'Tes vraies statistiques sur la durée. Win rate, R:R, biais, patterns d\'erreurs — les données honnêtes.',price:'9.99€',once:'97€'},
+              {num:'01',name:'EDGE PREP',tag:'BRIEFING PRÉ-SESSION',desc:"Es-tu en état de trader aujourd'hui ? EDGE Prep analyse ton état mental et te donne un verdict avant d'ouvrir ton premier chart.",price:'7.99€',once:'70€'},
+              {num:'02',name:'EDGE VALIDATOR',tag:'IA — VALIDATION DE TRADES',desc:"Ton trade respecte-t-il vraiment ton plan ? EDGE Validator analyse chaque condition et rend son verdict — sans émotion.",price:'19.99€',once:'197€'},
+              {num:'03',name:'EDGE RISK',tag:'GESTION DU RISQUE',desc:"Combien risquer sur ce trade ? EDGE Risk calcule ta position en temps réel et s'adapte à ta série en cours.",price:'7.99€',once:'70€'},
+              {num:'04',name:'EDGE INDICATOR',tag:'PINE SCRIPT V6 — TRADINGVIEW',desc:"L'indicateur qui lit le marché à ta place. VWAPs, sessions, FVG, signaux filtrés — tout sur un seul chart.",price:'4.99€',once:'47€'},
+              {num:'05',name:'EDGE JOURNAL',tag:'JOURNAL + TRACK RECORD',desc:"Note chaque trade en quelques secondes. Identifie tes erreurs. Mesure ta vraie progression.",price:'14.99€',once:'147€'},
+              {num:'06',name:'EDGE STATS',tag:'ANALYSE DE PERFORMANCE',desc:"Tes vraies statistiques sur la durée. Win rate, R:R, biais, patterns — les données honnêtes.",price:'9.99€',once:'97€'},
             ].map((t,i) => (
               <div className="tool" key={i}>
                 <div className="tool-num">0{i+1}</div>
@@ -166,7 +192,7 @@ export default function Home() {
                 <div>
                   <div className="tool-price">{t.price}<span style={{fontSize:'12px',color:'#6b6880'}}>/mois</span></div>
                   <div className="tool-price-sub">ou {t.once} achat unique</div>
-                  <a href="#" className="tool-link">EN SAVOIR PLUS →</a>
+                  <a href="#" className="tool-link">EN SAVOIR PLUS</a>
                 </div>
               </div>
             ))}
@@ -195,8 +221,8 @@ export default function Home() {
               <div className="b-sep">ou</div>
               <div className="b-once-lbl">ACHAT UNIQUE — ACCÈS À VIE</div>
               <div className="b-once">497€</div>
-              <div className="b-save">↑ ÉCONOMISE 292€ VS SÉPARÉ</div>
-              <button className="b-btn">PRENDRE LE BUNDLE →</button>
+              <div className="b-save">ÉCONOMISE 292€ VS SÉPARÉ</div>
+              <button className="b-btn">PRENDRE LE BUNDLE</button>
             </div>
           </div>
         </div>
@@ -213,9 +239,9 @@ export default function Home() {
             </div>
             <div className="pillars">
               {[
-                {w:'DISCIPLINE',t:'Respecter ton plan chaque jour, sans exception, sans émotion.'},
-                {w:'CLARTÉ',t:'Voir ce qui compte. Éliminer le bruit. Décisions claires sur données objectives.'},
-                {w:'UTILITÉ',t:'Chaque outil doit servir réellement, tous les jours. Si ce n\'est pas utile, ça n\'existe pas chez EDGE.'},
+                {w:'DISCIPLINE',t:"Respecter ton plan chaque jour, sans exception, sans émotion."},
+                {w:'CLARTÉ',t:"Voir ce qui compte. Éliminer le bruit. Décisions claires sur données objectives."},
+                {w:'UTILITÉ',t:"Chaque outil doit servir réellement, tous les jours. Si ce n'est pas utile, ça n'existe pas chez EDGE."},
               ].map((p,i) => (
                 <div className="pillar" key={i}>
                   <div className="pillar-word">{p.w}</div>
@@ -233,43 +259,5 @@ export default function Home() {
           <h2 className="h2">Questions.</h2>
           <div className="faq-wrap">
             {[
-              {q:'Pour quel niveau de trader ?',a:'Tous les niveaux. EDGE s\'adapte à ta stratégie — pas l\'inverse.'},
-              {q:'Est-ce que EDGE trade à ma place ?',a:'Non. EDGE valide ou invalide TES idées selon TON plan. La décision reste toujours la tienne.'},
-              {q:'Abonnement mensuel ou achat unique ?',a:'L\'abonnement donne accès tant que tu paies. L\'achat unique donne un accès à vie avec toutes les mises à jour — rentabilisé en moins de 10 mois.'},
-              {q:'Sur quels marchés ?',a:'Forex, indices, matières premières, actions, crypto, futures, options, ETF. Tous les actifs sur tous les marchés.'},
-            ].map((f,i) => (
-              <div className="faq-item" key={i} onClick={(e) => {
-                const el = e.currentTarget;
-                el.classList.toggle('open');
-              }}>
-                <div className="faq-q">{f.q}<span className="faq-icon">+</span></div>
-                <div className="faq-a">{f.a}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="cta">
-        <div className="cta-glow"></div>
-        <div className="cta-title">EDGE</div>
-        <div className="cta-sub">DISCIPLINE · CLARTÉ · AVANTAGE</div>
-        <div className="hero-btns">
-          <a href="#bundle" className="btn-white">PRENDRE LE BUNDLE — 497€</a>
-          <a href="#outils" className="btn-outline">VOIR LES OUTILS</a>
-        </div>
-      </section>
-
-      <footer>
-        <div className="footer-logo">EDGE</div>
-        <div className="footer-links">
-          <a href="#">TikTok</a>
-          <a href="#">Instagram</a>
-          <a href="#">Twitter/X</a>
-          <a href="#">YouTube</a>
-        </div>
-        <div className="footer-copy">© 2026 EDGE — @edge.trading</div>
-      </footer>
-    </>
-  )
-}
+              {q:'Pour quel niveau de trader ?',a:"Tous les niveaux. EDGE s'adapte à ta stratégie — pas l'inverse."},
+              {q:'Est-ce que EDGE trade à m
